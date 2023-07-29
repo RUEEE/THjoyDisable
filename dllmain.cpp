@@ -23,6 +23,8 @@ typedef MMRESULT(WINAPI* TimeBeginPeriodType)(UINT);
 typedef DWORD(WINAPI* TimeGetTimeType)();
 typedef MMRESULT (WINAPI* TimeGetDevCapsType)(void* ptc,UINT cbtc);
 
+
+
 typedef UINT    (WINAPI* MidiOutGetNumDevsType)             ();
 
 typedef MMRESULT(WINAPI* TimeKillEventType)                 (UINT timerid);
@@ -42,6 +44,7 @@ typedef MMRESULT(WINAPI* MidiOutUnprepareHeaderType)        (DWORD hmo  ,       
 typedef MMRESULT(WINAPI* MidiOutLongMsgType)                (DWORD hmo,         DWORD  pmh,         UINT cbmh);
 typedef MMRESULT(WINAPI* MidiOutPrepareHeaderType)          (DWORD hmo,         DWORD  pmh,         UINT cbmh);
 typedef MMRESULT(WINAPI* MmioAdvanceType)                   (DWORD hmmio,       DWORD  pmmioinfo,   UINT fuadvance);
+typedef MMRESULT(WINAPI* MidiOutGetDevCapsAType)            (UINT_PTR deviceid, DWORD  pmoc,        UINT cbmoc);
 
 typedef MMRESULT(WINAPI* MmioDescendType)                   (DWORD hmmio,       DWORD  pmmcki,      DWORD  pmmckiparent,    UINT fudesend);
 typedef MMRESULT(WINAPI* TimeSetEventType)                  (UINT udelay,       UINT  uresolution,  DWORD fptc,             DWORD dwUser,       UINT fuevent );
@@ -76,6 +79,7 @@ MidiOutCloseType              g_midiOutClose                ;
 MidiOutOpenType               g_midiOutOpen                 ;
 MidiOutGetNumDevsType         g_midiOutGetNumDevs           ;
 MmioAdvanceType               g_mmioAdvance                 ;
+MidiOutGetDevCapsAType        g_midiOutGetDevCapsA;
 
 extern "C" {
     MMRESULT WINAPI m_timeGetDevCaps        (void* ptc, UINT cbtc) {return g_timeGetDevCaps(ptc, cbtc);}
@@ -104,11 +108,13 @@ extern "C" {
     MMRESULT WINAPI m_midiOutLongMsg        (DWORD hmo,         DWORD  pmh,         UINT cbmh)		{return g_midiOutLongMsg        (hmo,pmh,cbmh);}
     MMRESULT WINAPI m_midiOutPrepareHeader  (DWORD hmo,         DWORD  pmh,         UINT cbmh)		{return g_midiOutPrepareHeader  (hmo,pmh,cbmh);}
     MMRESULT WINAPI m_mmioAdvance           (DWORD hmmio,       DWORD  pmmioinfo,   UINT fuadvance)	{return g_mmioAdvance           (hmmio,pmmioinfo,fuadvance);}
+    MMRESULT WINAPI m_midiOutGetDevCapsA    (UINT_PTR deviceid, DWORD  pmoc,        UINT cbmoc)     {return g_midiOutGetDevCapsA(deviceid,pmoc,cbmoc); }
     
     MMRESULT WINAPI m_mmioDescend           (DWORD hmmio,       DWORD  pmmcki,      DWORD  pmmckiparent,    UINT fudesend){return g_mmioDescend(hmmio,pmmcki,pmmckiparent,fudesend);}
    
     MMRESULT WINAPI m_timeSetEvent          (UINT udelay,       UINT  uresolution,  DWORD fptc,             DWORD dwUser,           UINT fuevent ){return g_timeSetEvent(udelay,uresolution,fptc,dwUser,fuevent);}
     MMRESULT WINAPI m_midiOutOpen           (DWORD phmo,        UINT  deviceid,     DWORD_PTR dwcallback,   DWORD_PTR dwinstance,   DWORD fdwopen){return g_midiOutOpen(phmo,deviceid,dwcallback,dwinstance, fdwopen);}
+
 }
 #pragma comment(linker, "/EXPORT:timeGetTime=_m_timeGetTime@0")
 #pragma comment(linker, "/EXPORT:timeEndPeriod=_m_timeEndPeriod@4")
@@ -137,6 +143,7 @@ extern "C" {
 #pragma comment(linker, "/EXPORT:midiOutLongMsg=_m_midiOutLongMsg@12")
 #pragma comment(linker, "/EXPORT:midiOutPrepareHeader=_m_midiOutPrepareHeader@12")
 #pragma comment(linker, "/EXPORT:mmioAdvance=_m_mmioAdvance@12")
+#pragma comment(linker, "/EXPORT:midiOutGetDevCapsA=_m_midiOutGetDevCapsA@12")
 
 #pragma comment(linker, "/EXPORT:mmioDescend=_m_mmioDescend@16")
 
@@ -181,6 +188,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
         GET_ADDR(midiOutOpen)
         GET_ADDR(midiOutGetNumDevs)
         GET_ADDR(mmioAdvance)
+        GET_ADDR(midiOutGetDevCapsA)
         break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
